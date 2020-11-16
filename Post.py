@@ -7,15 +7,35 @@ from email.mime.multipart import MIMEMultipart
 
 
 class Post():
+    """This class provides access to sen and receive google mail
+    """
 
     def __init__(self, login: str, password: str,
                  GMAIL_SMTP: str = "smtp.gmail.com", GMAIL_IMAP: str = "imap.gmail.com"):
+        """Initialize class with args
+
+        Args:
+            login (str): login@gmail.com
+            password (str): password for login
+            GMAIL_SMTP (str, optional): address of GMAIL SMTP server. Defaults to "smtp.gmail.com".
+            GMAIL_IMAP (str, optional): address of GMAIL IMAP server. Defaults to "imap.gmail.com".
+        """
         self.login = login
         self.password = password
         self.GMAIL_SMTP = GMAIL_SMTP
         self.GMAIL_IMAP = GMAIL_IMAP
 
-    def create_email_message(self, recipients: str, subject: str, message: str):
+    def create_email_message(self, recipients: list, subject: str, message: str):
+        """This function create a correct email message with necessesary fields
+
+        Args:
+            recipients (list): list of recipients
+            subject (str): subject of the letter
+            message (str): message body
+
+        Returns:
+            [MIMEMultipart]: correct email body
+        """
         result = MIMEMultipart()
         result['From'] = self.login
         result['To'] = ', '.join(recipients)
@@ -24,6 +44,17 @@ class Post():
         return result
 
     def send_mail(self, recipients: list, subject: str, message: str):
+        """This function sends mail
+
+        Args:
+            recipients (list): list of recipients
+            subject (str): subject of the letter
+            message (str): message body
+
+        Returns:
+            [bool]: True if meesage was sent
+                    False if wasn't 
+        """
 
         if len(recipients) < 1:
             return False
@@ -45,6 +76,15 @@ class Post():
             return False
 
     def receive_mail(self, filter_by_subject: str = None):
+        """This function receives mail from inbox
+
+        Args:
+            filter_by_subject (str, optional): Text which can filter subjects of receiving mails.
+             Defaults to None.
+
+        Returns:
+            [Message]: last message from inbox filtered by filter_by_subject
+        """
         mail_box = imaplib.IMAP4_SSL(self.GMAIL_IMAP)
         mail_box.login(self.login, self.password)
         mail_box.list()
@@ -64,9 +104,9 @@ if __name__ == "__main__":
     login = ""
     password = ""
     post = Post(login, password)
-    result = post.send_mail([login, ],
+    result = post.send_mail([login, login],
                             "Hello from Python!", "This is a test message from Python3!")
     print(result)
 
-    result = post.receive_mail()
+    result = post.receive_mail("")
     print(result)
